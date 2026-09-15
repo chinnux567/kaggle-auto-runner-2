@@ -1,6 +1,6 @@
 {
   "id"                 : "chinnux567/kaggle-auto-runner-2",
-  "title"              : "Free Fire vs PUBG Game",
+  "title"              : "Kaggle Auto Runner 2",
   "code_file"          : "notebook.py",
   "language"           : "python",
   "kernel_type"        : "script",
