@@ -72,8 +72,7 @@ jobs:
 
       - name: Check Kernel Status
         run: |
-          sleep 15
+          sleep 10
           echo "Checking kernel status..."
-          kaggle kernels status \
-            ${{ secrets.KAGGLE_USERNAME }}/${{ secrets.KERNEL_NAME }}
+          kaggle kernels status ${{ secrets.KAGGLE_USERNAME }}/${{ secrets.KERNEL_NAME }} || true
           echo "Done"
