@@ -1,0 +1,14 @@
+{
+  "id"                 : "chinnux567/kaggle-auto-runner-2",
+  "title"              : "Free Fire vs PUBG Game",
+  "code_file"          : "notebook.py",
+  "language"           : "python",
+  "kernel_type"        : "script",
+  "is_private"         : true,
+  "enable_gpu"         : false,
+  "enable_tpu"         : false,
+  "enable_internet"    : true,
+  "dataset_sources"    : [],
+  "competition_sources": [],
+  "kernel_sources"     : []
+}
