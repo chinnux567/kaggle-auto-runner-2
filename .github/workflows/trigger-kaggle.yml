@@ -1,0 +1,79 @@
+name: Kaggle Auto Runner 2
+
+on:
+  repository_dispatch:
+    types: [trigger-kaggle]
+  workflow_dispatch:
+
+jobs:
+  push-to-kaggle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install kaggle requests
+
+      - name: Verify Secrets
+        run: |
+          echo "Checking secrets..."
+          if [ -z "$KAGGLE_USERNAME" ]; then
+            echo "KAGGLE_USERNAME is empty"
+            exit 1
+          fi
+          if [ -z "$KAGGLE_KEY" ]; then
+            echo "KAGGLE_KEY is empty"
+            exit 1
+          fi
+          echo "All secrets OK"
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+
+      - name: Setup Kaggle Auth
+        run: |
+          mkdir -p ~/.kaggle
+          echo '{
+            "username": "${{ secrets.KAGGLE_USERNAME }}",
+            "key": "${{ secrets.KAGGLE_KEY }}"
+          }' > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+          echo "Kaggle auth done"
+
+      - name: Update Kernel Metadata
+        run: |
+          python3 -c "
+          import json, os
+          with open('kernel/kernel-metadata.json','r') as f:
+              m = json.load(f)
+          m['id'] = os.environ['KAGGLE_USERNAME'] + '/' + os.environ['KERNEL_NAME']
+          with open('kernel/kernel-metadata.json','w') as f:
+              json.dump(m, f, indent=2)
+          print('Kernel ID set to: ' + m['id'])
+          "
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KERNEL_NAME: ${{ secrets.KERNEL_NAME }}
+
+      - name: Push Kernel to Kaggle
+        run: |
+          echo "Pushing kernel..."
+          kaggle kernels push -p ./kernel
+          echo "Kernel pushed successfully"
+
+      - name: Check Kernel Status
+        run: |
+          sleep 15
+          echo "Checking kernel status..."
+          kaggle kernels status \
+            ${{ secrets.KAGGLE_USERNAME }}/${{ secrets.KERNEL_NAME }}
+          echo "Done"
